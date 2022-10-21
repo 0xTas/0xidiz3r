@@ -43,7 +43,7 @@ fn generate_random_chars(min: Option<u32>, max: Option<u32>) -> String {
     let mut rng_chars: Vec<char> = Vec::new();
     let mut rng = thread_rng();
     for _ in 0..=thread_rng().gen_range(min_len..=max_len) {
-        rng_chars.push(*CharSet::Letters.value().choose(&mut rng).expect("LETTERS should not be empty!"));
+        rng_chars.push(*CharSet::Letters.value().choose(&mut rng).expect("CharSet should not be empty!"));
     };
 
     let rng_string: String = rng_chars.into_iter().collect();
