@@ -39,8 +39,8 @@ impl CharSet {
 /// **Using default values is recommended unless you intend to make them smaller.**
 pub fn generate_random_chars(min: Option<u32>, max: Option<u32>) -> String {
     // Functionally-default values for min and max lengths.
-    let min_len: u32 = min.unwrap_or(69);
-    let max_len: u32 = max.unwrap_or(209);
+    let min_len: u32 = min.unwrap_or(7);
+    let max_len: u32 = max.unwrap_or(109);
 
     let mut rng_chars: Vec<char> = Vec::new();
     let mut rng = thread_rng();
