@@ -1,4 +1,4 @@
-use oxidizer::define_batch_variable;
+use oxidizer::{input, define_batch_variable};
 use oxidizer::batch::BatchObfuscator;
 use std::fs::File;
 use std::io::Write;
@@ -30,8 +30,10 @@ fn create_obfuscated_batch(src: &str) {
 }
 
 fn main() {
-    let poc: &str = "start C:/WINDOWS/System32/calc.exe";
+    // let poc: &str = "start C:/WINDOWS/System32/calc.exe";
 
-    create_obfuscated_batch(poc);
+    let poc: String = input("Enter Bash Command ~> ");
+
+    create_obfuscated_batch(poc.as_str().trim_end());
     println!("Obfuscation Complete.");
 }
