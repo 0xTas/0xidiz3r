@@ -3,12 +3,16 @@ use oxidizer::batch::BatchObfuscator;
 use std::fs::File;
 use std::io::Write;
 
+
+// TODO: Handle batch command length limit of 8191 bytes with dynamic payload-length adjustments?
 fn create_obfuscated_batch(src: &str) {
     let obfuscator: BatchObfuscator = BatchObfuscator::new(None, None);
 
     let mut commands: Vec<String> = Vec::new();
     let mut execute: Vec<String> = Vec::new(); 
 
+    commands.push(String::from(":: This file was obfuscated via https://github.com/0xTas/0xidiz3r "));
+    commands.push(String::from(":: This file can be programatically deobfuscated (soon™) via https://github.com/0xTas/0xidiz3r "));
     commands.push(String::from("@echo off"));
     commands.push(format!("set {}=set", obfuscator.set_str));
     commands.push(format!("%{}% {}= ", obfuscator.set_str, obfuscator.space_str));
@@ -23,6 +27,8 @@ fn create_obfuscated_batch(src: &str) {
 
     let execute_string: String = execute.join("");
     commands.push(execute_string);
+    commands.push(String::from(":: This file was obfuscated via https://github.com/0xTas/0xidiz3r "));
+    commands.push(String::from(":: This file can be programatically deobfuscated (soon™) via https://github.com/0xTas/0xidiz3r "));
 
     let final_code: String = commands.join("\n");
     let mut file = File::create("obfuscated.bat").expect("Failed to create file!");
