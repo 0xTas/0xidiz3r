@@ -1,4 +1,4 @@
-use oxidizer::{input, {input, define_batch_variable}};
+use oxidizer::{input, define_batch_variable};
 use oxidizer::batch::BatchObfuscator;
 use std::fs::File;
 use std::io::Write;
