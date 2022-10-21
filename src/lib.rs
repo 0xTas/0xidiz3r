@@ -1,3 +1,5 @@
+use std::io::{self, Write};
+
 use rand::seq::SliceRandom;
 use rand::{thread_rng, Rng};
 use batch::BatchObfuscator;
@@ -18,13 +20,13 @@ impl CharSet {
                             'v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
                             'R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','"','#',
                             '$','%','&','\'','(',')','*','+',',','-','.','/',':',';','<','=','>','?','@','[','\\',
-                            ']','^','_','`','{','|','}','~',' '],
+                            ']','^','_','`','{','|','}','~',' ', '\n', '\r'],
 
             CharSet::Letters => vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
                             'v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
                             'R','S','T','U','V','W','X','Y','Z'],
 
-            CharSet::BadChars => vec!['<','>','|','%','^','&']
+            CharSet::BadChars => vec!['<','>','|','%','^','&', '\n', '\r']
         }
     }
 }
@@ -35,7 +37,7 @@ impl CharSet {
 /// Max default value is 209 (*exceeding this value is not recommended*).<br>
 /// Call with None (e.g **generate_random_chars(None, None)** to use default values).<br>
 /// **Using default values is recommended unless you intend to make them smaller.**
-fn generate_random_chars(min: Option<u32>, max: Option<u32>) -> String {
+pub fn generate_random_chars(min: Option<u32>, max: Option<u32>) -> String {
     // Functionally-default values for min and max lengths.
     let min_len: u32 = min.unwrap_or(69);
     let max_len: u32 = max.unwrap_or(209);
@@ -54,6 +56,21 @@ fn generate_random_chars(min: Option<u32>, max: Option<u32>) -> String {
 /// Returns an obfuscated string representing a variable definition statement in Batch.
 pub fn define_batch_variable(name: String, value: String, prelude: &BatchObfuscator) -> String {
     format!("%{}%%{}%{}%{}%{}", prelude.set_str, prelude.space_str, name, prelude.eq_str, value)
+}
+
+
+/* General Utility Functions */
+
+pub fn input(prompt: &str) -> String {
+    let mut user_input: String = String::new();
+
+    print!("{}", prompt);
+    io::stdout().flush().expect("Write to console failed!");
+    io::stdin()
+        .read_line(&mut user_input)
+        .expect("Read from stdin failed!");
+
+    user_input
 }
 
 
@@ -77,9 +94,10 @@ mod tests {
 
     #[test]
     fn test_collisions() {
-        for _ in 0..=10 {
+        for _ in 0..10 {
             let mut used_strings: Vec<String> = Vec::new();
             let mut collisions: Vec<String> = Vec::new();
+            #[allow(non_snake_case)]
             for N in 0..=10000 {
                 let random_chars: String = generate_random_chars(None, None);
 
