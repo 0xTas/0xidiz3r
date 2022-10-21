@@ -32,7 +32,7 @@ fn create_obfuscated_batch(src: &str) {
 fn main() {
     // let poc: &str = "start C:/WINDOWS/System32/calc.exe";
 
-    let poc: String = input("Enter Bash Command ~> ");
+    let poc: String = input("Enter Batch Command ~> ");
 
     create_obfuscated_batch(poc.as_str().trim_end());
     println!("Obfuscation Complete.");
