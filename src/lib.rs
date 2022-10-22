@@ -14,7 +14,7 @@ pub enum CharSet {
 }
 
 impl CharSet {
-    fn value(&self) -> Vec<char> {
+    pub fn values(&self) -> Vec<char> {
         match *self {
             CharSet::FullSet => vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
                             'v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
@@ -45,7 +45,7 @@ pub fn generate_random_chars(min: Option<u32>, max: Option<u32>) -> String {
     let mut rng_chars: Vec<char> = Vec::new();
     let mut rng = thread_rng();
     for _ in 0..=thread_rng().gen_range(min_len..=max_len) {
-        rng_chars.push(*CharSet::Letters.value().choose(&mut rng).expect("CharSet should not be empty!"));
+        rng_chars.push(*CharSet::Letters.values().choose(&mut rng).expect("CharSet should not be empty!"));
     };
 
     let rng_string: String = rng_chars.into_iter().collect();
@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn test_charset() {
-        println!("Full_Charset: {:#?}\n Letters: {:#?}\n, BadChars: {:#?}", CharSet::FullSet.value(), CharSet::Letters.value(), CharSet::BadChars.value());
+        println!("Full_Charset: {:#?}\n Letters: {:#?}\n, BadChars: {:#?}", CharSet::FullSet.values(), CharSet::Letters.values(), CharSet::BadChars.values());
     }
 
     #[test]
