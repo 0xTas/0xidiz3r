@@ -1,6 +1,6 @@
-use oxidizer::{input, define_batch_variable};
+use oxidizer::{input, define_batch_variable, CharSet};
 use oxidizer::batch::BatchObfuscator;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::Write;
 
 
@@ -19,10 +19,16 @@ fn create_obfuscated_batch(src: &str) {
     commands.push(format!("%{}%%{}%{}==", obfuscator.set_str, obfuscator.space_str, obfuscator.eq_str));
 
     for chr in src.chars() {
-        let varname: &String = obfuscator.alphabet.get(&chr).expect("Key not in alphabet!");
 
-        commands.push(define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &obfuscator));
-        execute.push(format!("%{}%", varname.to_owned()));
+        if !CharSet::BadChars.values().contains(&chr) {
+            let varname: &String = obfuscator.alphabet.get(&chr).expect("Key not in alphabet!");
+
+            commands.push(define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &obfuscator));
+            execute.push(format!("%{}%", varname.to_owned()));
+        }else {
+            execute.push(format!("{}", chr.to_owned()));
+        }
+
     };
 
     let execute_string: String = execute.join("");
@@ -38,8 +44,14 @@ fn create_obfuscated_batch(src: &str) {
 fn main() {
     // let poc: &str = "start C:/WINDOWS/System32/calc.exe";
 
-    let poc: String = input("Enter Batch Command ~> ");
+    let poc: String = input("Enter Batch Command or Path to File ~> ");
 
-    create_obfuscated_batch(poc.as_str().trim_end());
+    let file_check = poc.clone();
+    if let Ok(contents) = fs::read_to_string(file_check.as_str().trim_end()) {
+        create_obfuscated_batch(contents.as_str().trim_end());
+    }else {
+        create_obfuscated_batch(poc.as_str().trim_end());
+    };
+
     println!("Obfuscation Complete.");
 }
