@@ -11,8 +11,8 @@ fn create_obfuscated_batch(src: &str) {
     let mut commands: Vec<String> = Vec::new();
     let mut execute: Vec<String> = Vec::new(); 
 
-    commands.push(String::from(":: This file was obfuscated via https://github.com/0xTas/0xidiz3r "));
-    commands.push(String::from(":: This file can be programatically deobfuscated (soon™) via https://github.com/0xTas/0xidiz3r "));
+    commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
+    commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
     commands.push(String::from("@echo off"));
     commands.push(format!("set {}=set", obfuscator.set_str));
     commands.push(format!("%{}% {}= ", obfuscator.set_str, obfuscator.space_str));
