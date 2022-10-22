@@ -1,7 +1,12 @@
 [package]
 name = "oxidizer"
+version = "0.1.2"
 authors = ["Zach Griffin (0xTas) <root@0xTas.dev>"]
-version = "0.1.1"
+description = "An attempt at reversible Batch & Powershell obfuscation."
+repository = "https://github.com/0xTas/0xidiz3r"
+readme = "README.md"
+license = "MIT"
+license-file = "LICENSE"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
