@@ -23,8 +23,8 @@ impl BatchObfuscator {
 
 fn build_alphabet() -> HashMap<char, String> {
     let mut alphabet: HashMap<char, String> = HashMap::new();
-    for chr in CharSet::FullSet.value() {
-        if !CharSet::BadChars.value().contains(&chr) {
+    for chr in CharSet::FullSet.values() {
+        if !CharSet::BadChars.values().contains(&chr) {
             let varname: String = generate_random_chars(None, None);
             alphabet.insert(chr, varname);
         }else {
