@@ -101,14 +101,6 @@ impl BatchObfuscator {
         handle_name
     }
 
-    /// Prints the obfuscated source of a pre-initialized BatchObfuscator to *stdout*.
-    pub fn print_obfuscated_code(&self) {
-        if self.initialized {
-            println!("{}", self.obfuscated_code);
-        }else {
-            println!("Obfuscator has not been initialized!");
-        };
-    }
 
     /* Utility */
 
