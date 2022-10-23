@@ -14,11 +14,11 @@ fn main() {
     if let Ok(contents) = fs::read_to_string(file_check.as_str().trim_end()) {
         obfuscator.initialize(None, None, contents.as_str().trim_end());
         let path = obfuscator.write_obfuscated_script(None);
-        println!("Obfuscation Complete.\n{}", path);
+        println!("\nDumped obfuscated output to file: {}\nObfuscation Complete.", path);
         
     }else {
         obfuscator.initialize(None, None, target.as_str().trim_end());
         let path = obfuscator.write_obfuscated_script(None);
-        println!("Obfuscation Complete.\n{}", path);
+        println!("\nDumped obfuscated output to file: {}\nObfuscation Complete.", path);
     };
 }
