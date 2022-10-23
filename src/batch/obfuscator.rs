@@ -44,10 +44,13 @@ impl BatchObfuscator {
     /// Longer commands run the risk of breaking in the terminal if the obfuscated length exceeds the limit.
     pub fn initialize(&mut self, min: Option<u32>, max: Option<u32>, src: &str) {
 
+        // Create obfuscated variables for the set keyword, the space character, and the assignment operator.
         self.set_str = generate_random_chars(min, max, &self.used_variable_strings);
         self.space_str = generate_random_chars(min, max, &self.used_variable_strings);
         self.eq_str = generate_random_chars(min, max, &self.used_variable_strings);
 
+        // Insert base64-encoded watermarks to assist any potential deobfuscation attempts in the wild.
+        // Write the script header defining an obfuscated way of assigning further variables.
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
         self.prep_commands.push(String::from("@echo off"));
@@ -55,8 +58,10 @@ impl BatchObfuscator {
         self.prep_commands.push(format!("%{}% {}= ", self.set_str, self.space_str));
         self.prep_commands.push(format!("%{}%%{}%{}==", self.set_str, self.space_str, self.eq_str));
 
+        // Build an obfuscated alphabet with variables and push their assignment statements into the prep_commands Vec.
         self.build_alphabet();
 
+        // Reassemble input source using obfuscated alphabet variables.
         for chr in src.chars() {
 
             if !CharSet::FullSet.values().contains(&chr) {
@@ -69,11 +74,13 @@ impl BatchObfuscator {
             };
         };
 
+        // Convert obfuscated output to a string and append it to the prep_commands Vec.
         let exec_string: String = self.exec_commands.join("");
         self.prep_commands.push(exec_string);
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
 
+        // Join the obfuscated output on newlines and complete the initialization.
         self.obfuscated_code = self.prep_commands.join("\n");
         self.initialized = true;
     }
