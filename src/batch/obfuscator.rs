@@ -1,5 +1,5 @@
 use std::{collections::{HashMap, HashSet}, fs::File, io::Write};
-use crate::{generate_random_chars, batch::CharSet};
+use crate::batch::{generate_random_chars, CharSet};
 
 
 // TODO: Handle batch command length limit of 8191 bytes with dynamic payload-length adjustments?
