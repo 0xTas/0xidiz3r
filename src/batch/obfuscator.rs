@@ -111,9 +111,7 @@ impl BatchObfuscator {
 
         for chr in CharSet::FullSet.values() {
 
-            if !CharSet::FullSet.values().contains(&chr) {
-                self.alphabet.insert(chr, format!("{}", chr));
-            }else if !CharSet::BadChars.values().contains(&chr) {
+            if !CharSet::BadChars.values().contains(&chr) {
                 let varname: String = generate_random_chars(None, None, &self.used_variable_strings);
                 self.alphabet.insert(chr, varname);
             }else {
