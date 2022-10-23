@@ -20,7 +20,9 @@ fn create_obfuscated_batch(src: &str) {
 
     for chr in src.chars() {
 
-        if !CharSet::BadChars.values().contains(&chr) {
+        if !CharSet::FullSet.values().contains(&chr) {
+            execute.push(format!("{}", chr.to_owned()));
+        }else if !CharSet::BadChars.values().contains(&chr) {
             let varname: &String = obfuscator.alphabet.get(&chr).expect("Key not in alphabet!");
 
             commands.push(define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &obfuscator));
