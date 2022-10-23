@@ -1,5 +1,5 @@
 use oxidizer::input;
-use oxidizer::batch::BatchObfuscator;
+use oxidizer::batch::obfuscator::BatchObfuscator;
 use std::fs;
 
 
