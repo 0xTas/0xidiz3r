@@ -3,6 +3,8 @@ use crate::batch::{generate_random_chars, CharSet};
 
 
 // TODO: Handle batch command length limit of 8191 bytes with dynamic payload-length adjustments?
+
+/// **An object that generates obfuscated batch commands from un-obfuscated source commands.**
 #[derive(Debug)]
 pub struct BatchObfuscator {
     pub set_str: String,
@@ -17,6 +19,8 @@ pub struct BatchObfuscator {
 }
 
 impl BatchObfuscator {
+
+    /// Creates a new, empty instance of a BatchObfuscator.
     pub fn new() -> Self {
         BatchObfuscator { 
             set_str: String::new(),
@@ -31,6 +35,13 @@ impl BatchObfuscator {
         }
     }
 
+    /// Initializes an empty BatchObfuscator, builds an obfuscated alphabet, and uses it to obfuscate the provided source code.<br><br>
+    /// *Min/Max* refer to length constraints on the obfuscated variable names.<br>
+    /// Call with *min* or *max* set to *None* to use default values.<br>
+    /// Min default value is (**7**), Max default value is (**109**).<br><br>
+    /// Batch has a single-line limit of **8191**, so keep this in mind when changing these values.<br><br>
+    /// Shorter commands can use larger values to generate more noise.<br>
+    /// Longer commands run the risk of breaking in the terminal if the obfuscated length exceeds the limit.
     pub fn initialize(&mut self, min: Option<u32>, max: Option<u32>, src: &str) {
 
         self.set_str = generate_random_chars(min, max, &self.used_variable_strings);
@@ -68,6 +79,9 @@ impl BatchObfuscator {
         self.initialized = true;
     }
 
+    /// Writes the obfuscated source of a pre-initialized BatchObfuscator to a file, and returns a string containing the name of that file.<br><br>
+    /// Output filename defaults to *obfuscated.bat* when **None** is passed into the parameter.<br><br>
+    /// **This method panics if file creation/writing fails.**
     pub fn write_obfuscated_script(&self, file_name: Option<String>) -> String {
 
         if !self.initialized { panic!("Obfuscator must first be initialized!"); };
@@ -81,6 +95,7 @@ impl BatchObfuscator {
         handle_name
     }
 
+    /// Prints the obfuscated source of a pre-initialized BatchObfuscator to *stdout*.
     pub fn print_obfuscated_code(&self) {
         if self.initialized {
             println!("{}", self.obfuscated_code);
@@ -91,6 +106,7 @@ impl BatchObfuscator {
 
     /* Utility */
 
+    /// Builds an obfuscated alphabet using the Batch obfuscation character set.
     fn build_alphabet(&mut self) {
 
         for chr in CharSet::FullSet.values() {
@@ -106,6 +122,7 @@ impl BatchObfuscator {
         };
     }
 
+    /// Returns a string representing an obfuscated variable definition statement in Batch.
     fn define_batch_variable(name: String, value: String, prelude: &BatchObfuscator) -> String {
         format!("%{}%%{}%{}%{}%{}", prelude.set_str, prelude.space_str, name, prelude.eq_str, value)
     }
