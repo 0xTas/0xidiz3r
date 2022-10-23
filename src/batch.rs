@@ -5,12 +5,17 @@ pub mod obfuscator;
 
 #[derive(Debug)]
 pub enum CharSet {
+    /// A character set equivalent to Python's `string.ascii_letters + string.digits + string.punctuation`.
     FullSet,
+    /// A character set equivalent to Python's `string.ascii_letters`.
     Letters,
+    /// A character set containing bad characters that break the terminal when obfuscated on their own.
     BadChars,
 }
 
 impl CharSet {
+
+    /// Returns a `Vec<char>` containing a character set for use in batch (de)obfuscation.
     pub fn values(&self) -> Vec<char> {
         match *self {
             CharSet::FullSet => vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
@@ -27,6 +32,7 @@ impl CharSet {
         }
     }
 }
+
 
 /* Batch Utility Functions */
 
