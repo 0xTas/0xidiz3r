@@ -47,7 +47,6 @@ impl BatchObfuscator {
         self.set_str = generate_random_chars(min, max, &self.used_variable_strings);
         self.space_str = generate_random_chars(min, max, &self.used_variable_strings);
         self.eq_str = generate_random_chars(min, max, &self.used_variable_strings);
-        self.build_alphabet();
 
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
@@ -56,14 +55,14 @@ impl BatchObfuscator {
         self.prep_commands.push(format!("%{}% {}= ", self.set_str, self.space_str));
         self.prep_commands.push(format!("%{}%%{}%{}==", self.set_str, self.space_str, self.eq_str));
 
+        self.build_alphabet();
+
         for chr in src.chars() {
 
             if !CharSet::FullSet.values().contains(&chr) {
                 self.exec_commands.push(format!("{}", chr.to_owned()));
             }else if !CharSet::BadChars.values().contains(&chr) {
                 let varname: &String = self.alphabet.get(&chr).expect("Key not in alphabet!");
-
-                self.prep_commands.push(BatchObfuscator::define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &self));
                 self.exec_commands.push(format!("%{}%", varname.to_owned()));
             }else {
                 self.exec_commands.push(format!("{}", chr.to_owned()));
@@ -113,7 +112,12 @@ impl BatchObfuscator {
 
             if !CharSet::BadChars.values().contains(&chr) {
                 let varname: String = generate_random_chars(None, None, &self.used_variable_strings);
-                self.alphabet.insert(chr, varname);
+                self.alphabet.insert(chr, varname.clone());
+
+                if !self.prep_commands.contains(&BatchObfuscator::define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &self)) {
+     
+                    self.prep_commands.push(BatchObfuscator::define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &self));
+                };
             }else {
                 self.alphabet.insert(chr, format!("{}", chr));
             };
