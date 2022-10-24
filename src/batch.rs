@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use rand::{thread_rng, Rng, prelude::SliceRandom};
 pub mod obfuscator;
+pub mod deobfuscator;
 
 
 #[derive(Debug)]
