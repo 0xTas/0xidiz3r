@@ -4,6 +4,9 @@ Batch technique: https://www.youtube.com/watch?v=0RADvfJysuA<br>
 
 Powershell technique (todo!()): https://www.youtube.com/watch?v=WJlqQYyzGi8<br>
 
+### Disclaimer
+
+**This program is for educational purposes only. This obfuscation is fairly trivial to reverse engineer. Don't be malicious.**<br>
 
 ### Usage<br>
 
