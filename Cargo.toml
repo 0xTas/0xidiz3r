@@ -1,6 +1,6 @@
 [package]
 name = "oxidizer"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Zach Griffin (0xTas) <root@0xTas.dev>"]
 description = "An attempt at reversible Batch & Powershell obfuscation."
 repository = "https://github.com/0xTas/0xidiz3r"
@@ -12,3 +12,4 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
+regex = "1.6.0"
