@@ -17,3 +17,5 @@ The program will prompt you for a batch command or path to a batch script.<br>
 Then, a script named "obfuscated.bat" will be created in the current directory.<br>
 
 The contents of .\obfuscated.bat is functionally equivalent to your source command/script.
+
+Then, the program will ask you for a path to an obfuscated script. It will attempt to deobfuscate it and dump the output to .\deobfuscated.bat.
