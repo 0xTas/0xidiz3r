@@ -88,41 +88,54 @@ impl BatchDeobfuscator {
 
         // Pull out any boilerplate variable definition lines
         let re_set_marker = Regex::new(format!("\n%{}%.?*\n", self.set_str).as_str()).expect("Regex not valid!");
-        let src: Vec<&str> = re_set_marker.split(&src).collect();
+        // let src: Vec<&str> = re_set_marker.split(&src).collect();
+
+        let src: Vec<&str> = src.split("\n").collect();
 
         // Iterate over the remaining obfuscated text and map the obfuscated strings to cleartext characters.
         let mut cleaned_chars: Vec<String> = Vec::new();
-        for var in src.join("\n").split("%") {
+        for line in src {
 
-            if var.contains(&self.set_str) || var.contains(&self.space_str) || var.contains(&self.eq_str) {
+            if line == "\n" || line == "\r\n" { continue; };
+
+            if line.contains(&self.set_str) || line.contains(&self.space_str) || line.contains(&self.eq_str) {
                 continue;
             };
 
-            if var.contains(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I=") 
-            || var.contains(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"){
+            if line.contains(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I=") 
+            || line.contains(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"){
                 continue;
             };
 
-            if let Some(chr) = self.alphabet.get(&var.to_string()) {
-                cleaned_chars.push(chr.to_string());
-            }else {
-                for c in self.alphabet.keys() {
-                    if var.contains(c.as_str()) { continue };
-                };
+            let lines: Vec<&str> = line.split("%").collect();
 
-                for character in var.chars() {
-                    cleaned_chars.push(character.to_string());
+            for blob in lines {
+                if let Some(chr) = self.alphabet.get(&blob.to_string()) {
+                    cleaned_chars.push(chr.to_string());
+                }else {
+                    for c in self.alphabet.keys() {
+                        if blob.contains(c.as_str()) { continue };
+                    };
+
+                    if !blob.contains(" ") && blob != "" && blob != "\r" {
+                        cleaned_chars.push(String::from("%"));
+                        for character in blob.chars() {
+                            cleaned_chars.push(character.to_string());
+                        };
+                        cleaned_chars.push(String::from("%"));
+                    }else {
+                        for character in blob.chars() {
+                            cleaned_chars.push(character.to_string());
+                        };
+                    };
                 };
             };
+
+            cleaned_chars.push(String::from("\n"));
         };
 
         // Clean up the last remaining artifacts of the obfuscation.
         cleaned_chars = cleaned_chars.join("").split("\n").map(|chr| chr.to_string()).collect();
-        let mut offset = 0;
-        for i in 0..44 {
-            cleaned_chars.remove((i-offset).try_into().unwrap());
-            offset += 1;
-        };
 
         // Reassemble the cleartext code and finalize the initialization.
         self.cleaned_code = cleaned_chars.join("\n");
