@@ -1,4 +1,5 @@
 use std::{fs::File, io::Write, collections::HashMap};
+use super::CharSet;
 use regex::Regex;
 
 
@@ -86,10 +87,6 @@ impl BatchDeobfuscator {
 
     fn deobfuscate(&mut self, src: String) {
 
-        // Pull out any boilerplate variable definition lines
-        let re_set_marker = Regex::new(format!("\n%{}%.?*\n", self.set_str).as_str()).expect("Regex not valid!");
-        // let src: Vec<&str> = re_set_marker.split(&src).collect();
-
         let src: Vec<&str> = src.split("\n").collect();
 
         // Iterate over the remaining obfuscated text and map the obfuscated strings to cleartext characters.
@@ -118,6 +115,12 @@ impl BatchDeobfuscator {
                     };
 
                     if !blob.contains(" ") && blob != "" && blob != "\r" {
+
+                        for character in blob.chars() {
+                            if CharSet::BadChars.values().contains(&character) {
+                                continue;
+                            };
+                        };
                         cleaned_chars.push(String::from("%"));
                         for character in blob.chars() {
                             cleaned_chars.push(character.to_string());
