@@ -1,6 +1,6 @@
 [package]
 name = "oxidizer"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Zach Griffin (0xTas) <root@0xTas.dev>"]
 description = "An attempt at reversible Batch & Powershell obfuscation."
 repository = "https://github.com/0xTas/0xidiz3r"
