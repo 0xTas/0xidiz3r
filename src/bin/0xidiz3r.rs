@@ -13,12 +13,12 @@ fn main() {
 
     let file_check = target.clone();
     if let Ok(contents) = fs::read_to_string(file_check.as_str().trim_end()) {
-        obfuscator.initialize(None, None, contents.as_str().trim_end());
+        obfuscator.initialize(None, None, contents.trim_end().to_string());
         let path = obfuscator.write_obfuscated_script(None);
         println!("\nDumped obfuscated output to file: {}\nObfuscation Complete.", path);
         
     }else {
-        obfuscator.initialize(None, None, target.as_str().trim_end());
+        obfuscator.initialize(None, None, target.trim_end().to_string());
         let path = obfuscator.write_obfuscated_script(None);
         println!("\nDumped obfuscated output to file: {}\nObfuscation Complete.", path);
     };
