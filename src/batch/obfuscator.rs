@@ -1,5 +1,6 @@
 use std::{collections::{HashMap, HashSet}, fs::File, io::Write};
-use crate::batch::{generate_random_chars, CharSet};
+use crate::{input, batch::{generate_random_chars, CharSet}};
+use regex::Regex;
 
 
 // TODO: Handle batch command length limit of 8191 bytes with dynamic payload-length adjustments?
@@ -15,6 +16,7 @@ pub struct BatchObfuscator {
     pub prep_commands: Vec<String>,
     pub exec_commands: Vec<String>,
     pub obfuscated_code: String,
+    echo_mode: bool,
     initialized: bool,
 }
 
@@ -31,8 +33,13 @@ impl BatchObfuscator {
             prep_commands: Vec::new(),
             exec_commands: Vec::new(),
             obfuscated_code: String::new(),
+            echo_mode: false,
             initialized: false,
         }
+    }
+
+    pub fn enable_echo(&mut self) {
+        self.echo_mode = true;
     }
 
     /// Initializes an empty BatchObfuscator, builds an obfuscated alphabet, and uses it to obfuscate the provided source code.<br><br>
@@ -53,13 +60,13 @@ impl BatchObfuscator {
         // Write the script header defining an obfuscated way of assigning further variables.
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
-        self.prep_commands.push(String::from("@echo off"));
+        if !self.echo_mode {self.prep_commands.push(String::from("@echo off"));};
         self.prep_commands.push(format!("set {}=set", self.set_str));
         self.prep_commands.push(format!("%{}% {}= ", self.set_str, self.space_str));
         self.prep_commands.push(format!("%{}%%{}%{}==", self.set_str, self.space_str, self.eq_str));
 
         // Build an obfuscated alphabet with variables and push their assignment statements into the prep_commands Vec.
-        self.build_alphabet();
+        self.build_alphabet(min.clone(), max.clone());
 
 
         self.obfuscate(src);
@@ -87,17 +94,23 @@ impl BatchObfuscator {
     /* Utility */
 
     /// Builds an obfuscated alphabet using the Batch obfuscation character set.
-    fn build_alphabet(&mut self) {
+    fn build_alphabet(&mut self, min: Option<u32>, max: Option<u32>) {
 
         for chr in CharSet::FullSet.values() {
-
+        
             if !CharSet::BadChars.values().contains(&chr) {
-                let varname: String = generate_random_chars(None, None, &self.used_variable_strings);
+                let varname: String = generate_random_chars(min, max, &self.used_variable_strings);
                 self.alphabet.insert(chr, varname.clone());
 
-                if !self.prep_commands.contains(&BatchObfuscator::define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &self)) {
-     
-                    self.prep_commands.push(BatchObfuscator::define_batch_variable(format!("{}", varname.to_owned()), format!("{}", chr.to_owned()), &self));
+                if !self.prep_commands.contains(&BatchObfuscator::define_batch_variable(
+                                            format!("{}", varname.to_owned()),
+                                            format!("{}", chr.to_owned()),
+                                            &self)) 
+                {
+                    self.prep_commands.push(BatchObfuscator::define_batch_variable(
+                                            format!("{}", varname.to_owned()),
+                                            format!("{}", chr.to_owned()),
+                                            &self));
                 };
             }else {
                 self.alphabet.insert(chr, format!("{}", chr));
@@ -107,17 +120,47 @@ impl BatchObfuscator {
 
     fn obfuscate(&mut self, src: String) {
 
-        // Reassemble input source using obfuscated alphabet variables.
-        for chr in src.chars() {
+        let match_variable_lines: Regex = Regex::new("%.+%").expect("Regex not valid!");
+        let match_set_lines: Regex = Regex::new("set .+=.+").expect("Regex not valid!");
+        let src_list: Vec<&str> = src.split("\n").collect();
+        let mut warned: bool = false;
 
-            if !CharSet::FullSet.values().contains(&chr) {
-                self.exec_commands.push(format!("{}", chr.to_owned()));
-            }else if !CharSet::BadChars.values().contains(&chr) {
-                let varname: &String = self.alphabet.get(&chr).expect("Key not in alphabet!");
-                self.exec_commands.push(format!("%{}%", varname.to_owned()));
+        for line in src_list {
+
+            if match_variable_lines.is_match(&line) || match_set_lines.is_match(&line) {
+
+                let mut heed: String = String::new();
+                if !warned {
+                    println!("\n[!]--> WARNING: Because of the way this obfuscation method works, 
+                        variables you define or use in your scripts cannot be further obfuscated, 
+                        and lines containing them will be printed as-is.");
+
+                    heed = input("\nContinue Anyway? [Y/N] ~> ");
+                };
+
+                if heed.to_lowercase().contains("y") || warned {
+                    self.exec_commands.push(format!("{}", line));
+                    warned = true;
+                }else {
+                    panic!("Obfuscation Aborted!");
+                };
             }else {
-                self.exec_commands.push(format!("{}", chr.to_owned()));
+
+                // Reassemble input source using obfuscated alphabet variables.
+                for chr in line.chars() {
+
+                    if !CharSet::FullSet.values().contains(&chr) {
+                        self.exec_commands.push(format!("{}", chr.to_owned()));
+                    }else if !CharSet::BadChars.values().contains(&chr) {
+                        let varname: &String = self.alphabet.get(&chr).expect("Key not in alphabet!");
+                        self.exec_commands.push(format!("%{}%", varname.to_owned()));
+                    }else {
+                        self.exec_commands.push(format!("{}", chr.to_owned()));
+                    };
+                };
             };
+
+            self.exec_commands.push("\n".to_string());
         };
 
         // Convert obfuscated output to a string and append it to the prep_commands Vec.
@@ -131,8 +174,10 @@ impl BatchObfuscator {
     }
 
     /// Returns a string representing an obfuscated variable definition statement in Batch.
-    fn define_batch_variable(name: String, value: String, prelude: &BatchObfuscator) -> String {
-        format!("%{}%%{}%{}%{}%{}", prelude.set_str, prelude.space_str, name, prelude.eq_str, value)
+    fn define_batch_variable(name: String, value: String, prelude: &BatchObfuscator)
+    -> String {
+        format!("%{}%%{}%{}%{}%{}", prelude.set_str,
+                prelude.space_str, name, prelude.eq_str, value)
     }
 
 }
@@ -144,7 +189,9 @@ mod tests {
 
     #[test]
     fn test_charset() {
-        println!("Full_Charset: {:#?}\n Letters: {:#?}\n, BadChars: {:#?}", CharSet::FullSet.values(), CharSet::Letters.values(), CharSet::BadChars.values());
+        println!("Full_Charset: {:#?}\n Letters: {:#?}\n, BadChars: {:#?}",
+                CharSet::FullSet.values(), CharSet::Letters.values(),
+                CharSet::BadChars.values());
     }
 
     #[test]
