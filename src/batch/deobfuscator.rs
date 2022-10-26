@@ -93,7 +93,7 @@ impl BatchDeobfuscator {
         let mut cleaned_chars: Vec<String> = Vec::new();
         for line in src {
 
-            if line == "\n" || line == "\r\n" { continue; };
+            if line == "\n" || line == "\r\n" || line == "" { continue; };
 
             if line.contains(&self.set_str) || line.contains(&self.space_str) || line.contains(&self.eq_str) {
                 continue;
@@ -115,17 +115,17 @@ impl BatchDeobfuscator {
                     };
 
                     if !blob.contains(" ") && blob != "" && blob != "\r" {
-
+                        let mut skip: bool = false;
                         for character in blob.chars() {
                             if CharSet::BadChars.values().contains(&character) {
-                                continue;
+                                skip = true;
                             };
                         };
-                        cleaned_chars.push(String::from("%"));
+                        if !skip { cleaned_chars.push(String::from("%")); };
                         for character in blob.chars() {
                             cleaned_chars.push(character.to_string());
                         };
-                        cleaned_chars.push(String::from("%"));
+                        if !skip { cleaned_chars.push(String::from("%")); };
                     }else {
                         for character in blob.chars() {
                             cleaned_chars.push(character.to_string());
@@ -141,6 +141,6 @@ impl BatchDeobfuscator {
         cleaned_chars = cleaned_chars.join("").split("\n").map(|chr| chr.to_string()).collect();
 
         // Reassemble the cleartext code and finalize the initialization.
-        self.cleaned_code = cleaned_chars.join("\n");
+        self.cleaned_code = cleaned_chars.join("\n").trim_end().to_string();
     }
 }
