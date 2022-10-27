@@ -127,9 +127,9 @@ impl BatchObfuscator {
 
         for line in src_list {
 
-            if (match_variable_lines.is_match(&line) && line.starts_with("set")) || 
-                match_set_lines.is_match(&line) 
-            {
+            if match_variable_lines.is_match(&line) || 
+                (match_set_lines.is_match(&line) && line.starts_with("Set")) {
+
                 let mut heed: String = String::new();
                 if !warned {
                     println!("\n[!]--> WARNING: Because of the way this obfuscation method works, 
