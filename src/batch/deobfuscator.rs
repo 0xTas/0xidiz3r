@@ -8,7 +8,7 @@ pub struct BatchDeobfuscator {
     pub set_str: String,
     pub space_str: String,
     pub eq_str: String,
-    pub alphabet: HashMap<String, char>,
+    pub alphabet: HashMap<String, String>,
     pub cleaned_code: String,
     initialized: bool,
 }
@@ -72,16 +72,31 @@ impl BatchDeobfuscator {
 
     fn reverse_alphabet(&mut self, src: &str) {
 
-        let re = Regex::new(r"[a-zA-Z]+%[a-zA-Z]+%.{1}\n").expect("Regex not valid!");
+        let re = Regex::new(r"[a-zA-Z]+%[a-zA-Z]+%.{1}\n").expect("Regex pattern invalid!");
 
         let matches: Vec<&str> = re.find_iter(src).map(|mat| mat.as_str()).collect();
 
         for mtch in matches {
-            let chr: char = mtch.chars().nth(mtch.len()-2).unwrap();
+            let chr: String = format!("{}", mtch.chars().nth(mtch.len()-2).unwrap());
 
             let name: String = String::from(mtch.split("%").collect::<Vec<&str>>()[0]);
 
             self.alphabet.insert(name, chr);
+        };
+
+        let re2 = Regex::new(r"[a-zA-Z]+%[a-zA-Z]+%.{2}\n").expect("Regex pattern invalid!");
+        let matches: Vec<&str> = re2.find_iter(src).map(|mat| mat.as_str()).collect();
+
+        for mtch in matches {
+            let blob: String = format!(
+                "{}{}",
+                mtch.chars().nth(mtch.len()-3).unwrap(),
+                mtch.chars().nth(mtch.len()-2).unwrap()
+            );
+
+            let name: String = String::from(mtch.split("%").collect::<Vec<&str>>()[0]);
+
+            self.alphabet.insert(name, blob);
         };
     }
 
@@ -104,9 +119,9 @@ impl BatchDeobfuscator {
                 continue;
             };
 
-            let lines: Vec<&str> = line.split("%").collect();
+            let code: Vec<&str> = line.split("%").collect();
 
-            for blob in lines {
+            for blob in code {
                 if let Some(chr) = self.alphabet.get(&blob.to_string()) {
                     cleaned_chars.push(chr.to_string());
                 }else {
