@@ -54,7 +54,7 @@ fn main() {
             println!("\nError! File not found.");
             println!("Please provide a valid path to an obfuscated file!");
             wait(4200);
-            return main();
+            exit(1);
         };
 
         let path: String = deobfuscator.write_deobfuscated_script(args.output_file);
