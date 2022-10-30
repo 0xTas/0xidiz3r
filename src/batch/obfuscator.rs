@@ -3,8 +3,6 @@ use crate::{input, batch::{generate_random_chars, CharSet}};
 use regex::Regex;
 
 
-// TODO: Handle batch command length limit of 8191 bytes with dynamic payload-length adjustments?
-
 /// **An object that generates obfuscated batch commands from un-obfuscated source commands.**
 #[derive(Debug)]
 pub struct BatchObfuscator {
@@ -68,7 +66,7 @@ impl BatchObfuscator {
         // Build an obfuscated alphabet with variables and push their assignment statements into the prep_commands Vec.
         self.build_alphabet(min.clone(), max.clone());
 
-
+        // Obfuscate the cleartext source code using our newly-created obfuscated alphabet.
         self.obfuscate(src);
 
         self.initialized = true;
@@ -118,6 +116,7 @@ impl BatchObfuscator {
         };
     }
 
+    // Obfuscates cleartext batch commands using an obfuscated alphabet of variables.
     fn obfuscate(&mut self, src: String) {
 
         let match_variable_lines: Regex = Regex::new("%[a-zA-Z0-9_-~!@#$^&/.,<>;'\"=]+%").expect("Regex not valid!");
@@ -127,6 +126,7 @@ impl BatchObfuscator {
 
         for line in src_list {
 
+            // Find char indicies for any occurances of '%' in a line.
             let find_percent_index = || {
                 let mut perc_index: Vec<usize> = Vec::new();
                 for (i, c) in line.char_indices() {
@@ -140,6 +140,7 @@ impl BatchObfuscator {
                 Some(perc_index)
             };
 
+            // If percent is used but not to call a variable, obfuscate this line separately.
             if line.contains("%") && !match_variable_lines.is_match(&line) {
 
                 let perc_index: Vec<usize> = find_percent_index().expect("No percent symbols in sample!");
@@ -176,6 +177,7 @@ impl BatchObfuscator {
                     };
                 };
 
+            // If the input script contains custom/environment vars, warn about this method's limitations.
             }else if match_variable_lines.is_match(&line) || 
                 (match_set_lines.is_match(&line) && line.to_lowercase().starts_with("set")) {
 

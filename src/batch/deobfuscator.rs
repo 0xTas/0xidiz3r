@@ -3,6 +3,7 @@ use super::CharSet;
 use regex::Regex;
 
 
+/// **An object that generates cleartext batch commands from obfuscated source commands.**
 #[derive(Debug)]
 pub struct BatchDeobfuscator {
     pub set_str: String,
@@ -28,8 +29,8 @@ impl BatchDeobfuscator {
         }
     }
 
+    /// Initializes an empty BatchDeobfuscator, reverse_engineers an obfuscated alphabet, and attempts to deobfuscate the provided source code.
     pub fn initialize(&mut self, src: String) {
-
 
         // Pattern matching to identify set, space, and equals variables.
         let re_set = Regex::new("set [a-zA-Z]+=set").expect("Regex not valid!");
@@ -50,12 +51,15 @@ impl BatchDeobfuscator {
         // Reverse engineer the obfuscated alphabet and build a cleartext charset.
         self.reverse_alphabet(&src);
 
+        // Deobfuscate the source code using the reverse-engineered obfuscation alphabet.
         self.deobfuscate(src);
 
         self.initialized = true;
     }
 
-
+    /// Writes the deobfuscated source of a pre-initialized BatchDeobfuscator to a file, and returns a string containing the name of that file.<br><br>
+    /// Output filename defaults to *deobfuscated.bat* when **None** is passed into the parameter.<br><br>
+    /// **This method panics if file creation/writing fails.**
     pub fn write_deobfuscated_script(&self, file_name: Option<String>) -> String {
 
         if !self.initialized { panic!("Deobfuscator must first be initialized!"); };
@@ -69,7 +73,7 @@ impl BatchDeobfuscator {
         handle_name
     }
 
-
+    /// Reverse-engineers an obfuscated alphabet using known patterns in the obfuscated source code.
     fn reverse_alphabet(&mut self, src: &str) {
 
         let re = Regex::new(r"[a-zA-Z]+%[a-zA-Z]+%.{1}\n").expect("Regex pattern invalid!");
@@ -100,6 +104,7 @@ impl BatchDeobfuscator {
         };
     }
 
+    /// Deobfuscates a sample of obfuscated batch commands using a reverse-engineered obfuscation alphabet.
     fn deobfuscate(&mut self, src: String) {
 
         let src: Vec<&str> = src.split("\n").collect();
