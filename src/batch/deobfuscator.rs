@@ -127,6 +127,24 @@ impl BatchDeobfuscator {
 
             self.alphabet.insert(name, blob);
         };
+
+        let re3 = Regex::new(r"%[a-zA-Z]+%%[a-zA-Z]+%[a-zA-Z]+%[a-zA-Z]+%.{3,}\n").expect("Regex pattern invalid!");
+        let matches: Vec<&str> = re3.find_iter(src).map(|mat| mat.as_str()).collect();
+
+        for mtch in matches {
+            match mtch.find(&self.eq_str) {
+                Some(index) => {
+                    let name_haystack: Vec<&str> = mtch.split("%").collect();
+                    let name: String = String::from(name_haystack[name_haystack.len()-3]);
+                    let blob: &str = &mtch[(index+self.eq_str.len()+1)..];
+                    println!("name {:#?}", mtch.split("%").collect::<Vec<&str>>());
+                    self.alphabet.insert(name, blob.to_string());
+                },
+                None => {
+                    continue;
+                },
+            };
+        };
     }
 
     /// Deobfuscates a sample of obfuscated batch commands using a reverse-engineered obfuscation alphabet.
