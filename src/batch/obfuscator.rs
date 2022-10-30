@@ -120,21 +120,71 @@ impl BatchObfuscator {
 
     fn obfuscate(&mut self, src: String) {
 
-        let match_variable_lines: Regex = Regex::new("%.+%").expect("Regex not valid!");
+        let match_variable_lines: Regex = Regex::new("%[a-zA-Z0-9_-~!@#$^&/.,<>;'\"=]+%").expect("Regex not valid!");
         let match_set_lines: Regex = Regex::new("set .+=.+").expect("Regex not valid!");
         let src_list: Vec<&str> = src.split("\n").collect();
         let mut warned: bool = false;
 
         for line in src_list {
 
-            if match_variable_lines.is_match(&line) || 
-                (match_set_lines.is_match(&line) && line.starts_with("Set")) {
+            let find_percent_index = || {
+                let mut perc_index: Vec<usize> = Vec::new();
+                for (i, c) in line.char_indices() {
+                    if c == '%' {
+                        perc_index.push(i);
+                    };
+                };
+
+                if perc_index.len() <= 0 { return None };
+
+                Some(perc_index)
+            };
+
+            if line.contains("%") && !match_variable_lines.is_match(&line) {
+
+                let perc_index: Vec<usize> = find_percent_index().expect("No percent symbols in sample!");
+
+                let mut skip: bool = false;
+                for (i, c) in line.char_indices() {
+
+                    if skip {
+                        skip = false;
+                        continue;
+                    };
+
+                    if perc_index.contains(&i) {
+                        let blob: &str = &line.clone()[i..=i+1];
+                        let mut obfuscate_blob = || {
+                            let varname: String = generate_random_chars(None, None, &self.used_variable_strings);
+                            let varline: String = BatchObfuscator::define_batch_variable(varname.clone(), blob.to_string(), &self);
+
+                            self.prep_commands.push(varline);
+                            self.exec_commands.push(format!("%{}%", varname));
+                        };
+                        obfuscate_blob();
+                        skip = true;
+                        continue;
+                    };
+
+                    if !CharSet::FullSet.values().contains(&c) {
+                        self.exec_commands.push(format!("{}", c.to_owned()));
+                    }else if !CharSet::BadChars.values().contains(&c) {
+                        let varname: &String = self.alphabet.get(&c).expect("Key not in alphabet!");
+                        self.exec_commands.push(format!("%{}%", varname.to_owned()));
+                    }else {
+                        self.exec_commands.push(format!("{}", c.to_owned()));
+                    };
+                };
+
+            }else if match_variable_lines.is_match(&line) || 
+                (match_set_lines.is_match(&line) && line.to_lowercase().starts_with("set")) {
 
                 let mut heed: String = String::new();
                 if !warned {
                     println!("\n[!]--> WARNING: Because of the way this obfuscation method works, 
-                        variables you define or use in your scripts cannot be further obfuscated, 
-                        and lines containing them will be printed as-is.");
+                        variables you define or use in your scripts, including environment variables,
+                        cannot be effectively obfuscated using this obfuscation method, 
+                        and lines containing them will be printed as-is in order to preserve functionality.");
 
                     heed = input("\nContinue Anyway? [Y/N] ~> ");
                 };
