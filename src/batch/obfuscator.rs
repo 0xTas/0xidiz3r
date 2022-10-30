@@ -131,7 +131,7 @@ impl BatchObfuscator {
     // Obfuscates cleartext batch commands using an obfuscated alphabet of variables.
     fn obfuscate(&mut self, src: String) {
 
-        let match_variable_lines: Regex = Regex::new("%[a-zA-Z0-9_-~!@#$^&/.,<>;'\"=]+%").expect("Regex not valid!");
+        let match_variable_lines: Regex = Regex::new("%[a-zA-Z0-9_-~!@#$^&/.,<>;:'\"=]+%").expect("Regex not valid!");
         let match_set_lines: Regex = Regex::new("set .+=.+").expect("Regex not valid!");
         let src_list: Vec<&str> = src.split("\n").collect();
         let mut warned: bool = false;
@@ -152,7 +152,6 @@ impl BatchObfuscator {
                 Some(perc_index)
             };
 
-            // If percent is used but not to call a variable, obfuscate this line separately.
             if line.contains("%") && !match_variable_lines.is_match(&line) {
 
                 let perc_index: Vec<usize> = find_percent_index().expect("No percent symbols in sample!");
@@ -190,14 +189,15 @@ impl BatchObfuscator {
                 };
 
             // If the input script contains custom/environment vars, warn about this method's limitations.
-            }else if match_variable_lines.is_match(&line) || 
+            }else if match_variable_lines.is_match(&line) ||
+                (line.starts_with(":") && !line.starts_with("::")) || 
                 (match_set_lines.is_match(&line) && line.to_lowercase().starts_with("set")) {
 
                 let mut heed: String = String::new();
                 if !warned {
                     println!("\n[!]--> WARNING: Because of the way this obfuscation method works, 
                         variables you define or use in your scripts, including environment variables,
-                        cannot be effectively obfuscated using this obfuscation method, 
+                        and function labels, cannot be effectively obfuscated using this obfuscation method, 
                         and lines containing them will be printed as-is in order to preserve functionality.");
 
                     heed = input("\nContinue Anyway? [Y/N] ~> ");
