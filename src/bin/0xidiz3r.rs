@@ -31,9 +31,9 @@ fn main() {
 
         let file_check = target.clone();
         if let Ok(contents) = fs::read_to_string(file_check.as_str().trim_end()) {
-            if contents.contains("echo") {
+            if contents.to_lowercase().contains("echo") && !contents.to_lowercase().contains("@echo off") {
                 println!("\n[!]--> INFO: By default, \"@echo off\" is inserted to aid the obfuscation.");
-                let cont: String = input("Would you like to preserve the script's echo functionality instead? [Y/N] ~> ");
+                let cont: String = input("Would you like to preserve the script's cmd echo functionality instead? [Y/N] ~> ");
 
                 if cont.to_lowercase().contains("y") {
                     obfuscator.enable_echo();
