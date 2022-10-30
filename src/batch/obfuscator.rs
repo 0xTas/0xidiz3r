@@ -69,7 +69,7 @@ impl BatchObfuscator {
         // Insert base64-encoded watermarks to assist any potential deobfuscation attempts in the wild.
         // Write the script header defining an obfuscated way of assigning further variables.
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
-        self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
+        self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
         if !self.echo_mode {self.prep_commands.push(String::from("@echo off"));};
         self.prep_commands.push(format!("set {}=set", self.set_str));
         self.prep_commands.push(format!("%{}% {}= ", self.set_str, self.space_str));
@@ -232,7 +232,7 @@ impl BatchObfuscator {
         let exec_string: String = self.exec_commands.join("");
         self.prep_commands.push(exec_string);
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
-        self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIChzb29u4oSiKSB2aWEgaHR0cHM6Ly9naXRodWIuY29tLzB4VGFzLzB4aWRpejNy"));
+        self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
 
         // Join the obfuscated output on newlines and complete the initialization.
         self.obfuscated_code = self.prep_commands.join("\n");
