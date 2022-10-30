@@ -1,4 +1,8 @@
-use std::io::{self, Write};
+use std::{
+    time::Duration,
+    io::{self, Write}, 
+    thread::sleep,
+};
 pub mod batch;
 
 
@@ -16,4 +20,10 @@ pub fn input(prompt: &str) -> String {
         .expect("Read from stdin failed!");
 
     user_input
+}
+
+/// Sleeps for the given time in milliseconds.
+pub fn wait(dur: u64) {
+    let dur: Duration = Duration::from_millis(dur);
+    sleep(dur);
 }
