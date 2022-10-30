@@ -3,7 +3,7 @@ use super::CharSet;
 use regex::Regex;
 
 
-/// **An object that generates cleartext batch commands from obfuscated source commands.**
+/// ### An object that generates cleartext batch commands from obfuscated source commands.<br>
 /// ### Example Usage:<br>
 /// ```
 /// use oxidizer::batch::deobfuscator::BatchDeobfuscator;
