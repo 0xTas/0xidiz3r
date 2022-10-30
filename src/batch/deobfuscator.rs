@@ -4,6 +4,31 @@ use regex::Regex;
 
 
 /// **An object that generates cleartext batch commands from obfuscated source commands.**
+/// ### Example Usage:<br>
+/// ```
+/// use oxidizer::batch::deobfuscator::BatchDeobfuscator;
+/// 
+/// let poc = r"
+/// set HQTW=set
+/// %HQTW% HswBh= 
+/// %HQTW%%HswBh%xtYRu==
+/// %HQTW%%HswBh%ubBBS%xtYRu%c
+/// %HQTW%%HswBh%XRVHZ%xtYRu%e
+/// %HQTW%%HswBh%qWvHi%xtYRu%h
+/// %HQTW%%HswBh%XyVFS%xtYRu%o
+/// %HQTW%%HswBh%BslH%xtYRu%C
+/// %HQTW%%HswBh%AsBi%xtYRu%P
+/// %HQTW%%HswBh%biQK%xtYRu% 
+/// %XRVHZ%%ubBBS%%qWvHi%%XyVFS%%biQK%%AsBi%%XyVFS%%BslH%
+/// ";
+/// 
+/// let mut deobfuscator = BatchDeobfuscator::new();
+/// deobfuscator.initialize(poc.to_string());
+/// 
+/// let deobfuscated_script = deobfuscator.write_deobfuscated_script(None);
+/// 
+/// // prints: "Deobfuscated code was written to: deobfuscated.bat".
+/// println!("Deobfuscated code was written to: {}", deobfuscated_script);
 #[derive(Debug)]
 pub struct BatchDeobfuscator {
     pub set_str: String,

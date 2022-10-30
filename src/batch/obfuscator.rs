@@ -3,7 +3,19 @@ use crate::{input, batch::{generate_random_chars, CharSet}};
 use regex::Regex;
 
 
-/// **An object that generates obfuscated batch commands from un-obfuscated source commands.**
+/// ### An object that generates obfuscated batch commands from un-obfuscated source commands.<br>
+/// ### Example Usage:<br>
+/// ```
+/// use oxidizer::batch::obfuscator::BatchObfuscator;
+/// 
+/// let poc = "start C:/Windows/System32/calc.exe";
+/// let mut obfuscator = BatchObfuscator::new();
+/// obfuscator.initialize(None, None, poc.to_string());
+/// 
+/// let obfuscated_script = obfuscator.write_obfuscated_script(None);
+/// 
+/// // prints: "Obfuscated code was written to: obfuscated.bat".
+/// println!("Obfuscated code was written to: {}", obfuscated_script);
 #[derive(Debug)]
 pub struct BatchObfuscator {
     pub set_str: String,
