@@ -4,7 +4,7 @@ Batch technique: https://www.youtube.com/watch?v=0RADvfJysuA<br>
 
 Powershell technique (todo!()): https://www.youtube.com/watch?v=WJlqQYyzGi8<br>
 
-## Background
+## Background (Batch)
 
 **Obfuscation:**<br>
 
