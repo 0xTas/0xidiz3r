@@ -22,7 +22,7 @@ SOFTWARE. */
 use rand::{
     Rng,
     thread_rng,
-    prelude::SliceRandom
+    prelude::SliceRandom,
 };
 use std::collections::HashSet;
 
