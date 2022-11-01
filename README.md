@@ -114,6 +114,9 @@ A simple CLI tool is provided as an abstraction over the API for your convenienc
 
 # To obfuscate a source file, adding "@echo off" and writing to a custom output file:
 .\0xidiz3r.exe input.bat -e -o output.bat
+
+# To deobfuscate a source file:
+.\0xidiz3r.exe -d output.bat
 ```
 <br>
 
@@ -127,6 +130,9 @@ A simple CLI tool is provided as an abstraction over the API for your convenienc
 
 # To obfuscate a source file, adding "@echo off" and writing to a custom output file:
 ./0xidiz3r input.bat -e -o output.bat
+
+# To deobfuscate a source file with a custom output file-name:
+./0xidiz3r -d output.bat -o cleaned.bat
 ```
 
 ---
