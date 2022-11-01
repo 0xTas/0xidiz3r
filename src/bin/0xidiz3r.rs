@@ -19,11 +19,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
 
-use oxidizer::wait;
-use oxidizer::batch::obfuscator::BatchObfuscator;
-use oxidizer::batch::deobfuscator::BatchDeobfuscator;
 use clap::Parser;
-use std::{fs, process::exit};
+use std::{
+    fs,
+    process::exit
+};
+use oxidizer::{
+    wait,
+    batch::{
+        obfuscator::BatchObfuscator,
+        deobfuscator::BatchDeobfuscator,
+    },
+};
 
 
 #[derive(Parser, Debug)]
@@ -37,8 +44,8 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     deobfuscate: bool,
 
-    /// Don't add "@echo off" to the output script.
-    #[arg(long, default_value_t = true)]
+    /// Add "@echo off" to the output script to avoid echoing cleartext commands
+    #[arg(short, long, default_value_t = false)]
     echo_off: bool,
 
     /// Custom name for the output file
@@ -53,6 +60,7 @@ struct Args {
     #[arg(long)]
     max: Option<u32>
 }
+
 
 fn main() {
     
@@ -81,12 +89,11 @@ fn main() {
         let path: String = deobfuscator.write_deobfuscated_script(args.output_file);
         println!("\nDumped deobfuscated output to file: {}\nDeobfuscation Complete.", path);
 
-
         exit(0);
     }else {
         let mut obfuscator: BatchObfuscator = BatchObfuscator::new();
-        if !args.echo_off {
-            obfuscator.enable_echo();
+        if args.echo_off {
+            obfuscator.dont_echo();
         };
 
         if let Ok(contents) = fs::read_to_string(args.input.trim_end()) {

@@ -19,13 +19,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
 
-use std::{
-    collections::{HashMap, HashSet},
-    fs::File,
-    io::Write
-};
-use crate::{input, batch::{generate_random_chars, CharSet}};
 use regex::Regex;
+use std::{
+    fs::File,
+    io::Write,
+    collections::{
+        HashMap,
+        HashSet
+    },
+};
+use crate::{
+    input,
+    batch::{
+        generate_random_chars,
+        CharSet
+    },
+};
 
 
 /// ### An object that generates obfuscated batch commands from un-obfuscated source commands.<br>
@@ -73,7 +82,8 @@ impl BatchObfuscator {
         }
     }
 
-    pub fn enable_echo(&mut self) {
+    /// Prevents from writing boiler-plate "@echo off" to output script.
+    pub fn dont_echo(&mut self) {
         self.echo_mode = true;
     }
 
@@ -95,7 +105,7 @@ impl BatchObfuscator {
         // Write the script header defining an obfuscated way of assigning further variables.
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIHdhcyBvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
         self.prep_commands.push(String::from(":: VGhpcyBmaWxlIGNhbiBiZSBwcm9ncmFtYXRpY2FsbHkgZGVvYmZ1c2NhdGVkIHZpYSBodHRwczovL2dpdGh1Yi5jb20vMHhUYXMvMHhpZGl6M3I="));
-        if !self.echo_mode {self.prep_commands.push(String::from("@echo off"));};
+        if self.echo_mode {self.prep_commands.push(String::from("@echo off"));};
         self.prep_commands.push(format!("set {}=set", self.set_str));
         self.prep_commands.push(format!("%{}% {}= ", self.set_str, self.space_str));
         self.prep_commands.push(format!("%{}%%{}%{}==", self.set_str, self.space_str, self.eq_str));
