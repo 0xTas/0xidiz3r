@@ -19,8 +19,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
 
+use rand::{
+    Rng,
+    thread_rng,
+    prelude::SliceRandom
+};
 use std::collections::HashSet;
-use rand::{thread_rng, Rng, prelude::SliceRandom};
+
 pub mod obfuscator;
 pub mod deobfuscator;
 
