@@ -13,3 +13,6 @@ edition = "2021"
 clap = { version = "4.0.18", features = ["derive"] }
 rand = "0.8.5"
 regex = "1.6.0"
+
+[profile.release]
+lto = true
