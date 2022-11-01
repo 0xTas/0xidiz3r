@@ -94,7 +94,7 @@ deobfuscator.initialize(source);
 deobfuscator.write_deobfuscated_script(None); // Using "None" causes the method to use a default filename: "deobfuscated.bat".
 
 // Or alternatively, to stdout:
-println!("{}", deobfuscator.cleaned_code);
+println!("{:#?}", deobfuscator.cleaned_code);
 ```
 
 ---
