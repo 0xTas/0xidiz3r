@@ -106,21 +106,27 @@ A simple CLI tool is provided as an abstraction over the API for your convenienc
 
 **Windows:**<br>
 ```powershell
+# To obfuscate a source command from stdin (with -e to disable command echoing):
+.\0xidiz3r.exe "start C:/Windows/System32/calc.exe" -e
+
 # To obfuscate a source file with the default configuration:
 .\0xidiz3r.exe input.bat
 
 # To obfuscate a source file, adding "@echo off" and writing to a custom output file:
-.\0xidiz3r.exe -e -o output.bat input.bat
+.\0xidiz3r.exe input.bat -e -o output.bat
 ```
 <br>
 
 **Linux/MacOS:**<br>
 ```bash
+# To obfuscate a source command from stdin (with -e to disable command echoing):
+./0xidiz3r "start C:/Windows/System32/calc.exe" -e
+
 # To obfuscate a source file with the default configuration:
 ./0xidiz3r input.bat
 
 # To obfuscate a source file, adding "@echo off" and writing to a custom output file:
-./0xidiz3r -e -o output.bat input.bat
+./0xidiz3r input.bat -e -o output.bat
 ```
 
 ---
