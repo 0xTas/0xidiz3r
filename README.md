@@ -100,9 +100,9 @@ println!("{}", deobfuscator.cleaned_code);
 ---
 
 ### As a CLI Utility: <br>
-The following assumes that you have either downloaded a release binary or cloned the repo and built it using `cargo build --release`.<br>
+The following assumes that you have either downloaded a release binary or cloned the repo and built it using `cargo build --release`.<br><br>
 
-A simple CLI tool is provided as an abstraction over the API for your convenience:<br><br>
+A simple CLI tool is provided as an abstraction over the API for your convenience:<br>
 
 **Windows:**<br>
 ```powershell
@@ -112,7 +112,7 @@ A simple CLI tool is provided as an abstraction over the API for your convenienc
 # To obfuscate a source file, adding "@echo off" and writing to a custom output file:
 .\0xidiz3r.exe -e -o output.bat input.bat
 ```
-<br><br>
+<br>
 
 **Linux/MacOS:**<br>
 ```bash
