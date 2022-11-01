@@ -17,7 +17,7 @@ In my testing, this particular technique is trivial to unravel as a human analys
 
 *Most things seem to work, however there are notable limitations:*<br><br>
 **Variables:** User-defined or environment variables cannot be effectively obfuscated using this technique.
-This is because, while Batch **can** technically double-nest variable definitions and usages as long as an obfuscation variable is defined on the entire line,
+This is because, while Batch **can** technically double-nest variable definitions and usages **as long as** an obfuscation variable is defined on the entire line,
 the act of defining that line as an obfuscated variable will still require printing the cleartext un-obfuscated version of that line into the output script, effectively canceling the obfuscation effect.<br>
 
 **Function Labels:** Batch function labels `:EXAMPLE`, can also not be obfuscated letter-by-letter, but the `goto :EXAMPLE` commands can be.
@@ -100,7 +100,7 @@ println!("{}", deobfuscator.cleaned_code);
 ---
 
 ### As a CLI Utility: <br>
-The following assumes that you have cloned the repo and built the binary using `cargo build --release`.<br>
+The following assumes that you have either downloaded a release binary or cloned the repo and built it using `cargo build --release`.<br>
 
 A simple CLI tool is provided as an abstraction over the API for your convenience:<br><br>
 
@@ -124,3 +124,10 @@ A simple CLI tool is provided as an abstraction over the API for your convenienc
 ```
 
 ---
+
+## Future Plans
+
+- Improve batch obfuscation technique (recursive reuse? ascii exit codes? additional modes?)
+- Improve batch deobfuscation technique to match
+- Introduce Powershell path obfuscation module
+- Introduce Powershell path deobfuscation module (accepts script with obfuscated binary paths and attempts to deobfuscate them)
