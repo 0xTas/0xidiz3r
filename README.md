@@ -74,7 +74,7 @@ let filename = String::from("obfuscated.bat");
 obfuscator.write_obfuscated_script(Some(filename));
 
 // You could also print to stdout if necessary, though it can be spammy and copy/pasting might be unreliable:
-println!("{:#?}", obfuscator.obfuscated_code);
+println!("{:?}", obfuscator.obfuscated_code);
 ```
 <br><br>
 **Deobfuscation:**<br>
@@ -94,7 +94,7 @@ deobfuscator.initialize(source);
 deobfuscator.write_deobfuscated_script(None); // Using "None" causes the method to use a default filename: "deobfuscated.bat".
 
 // Or alternatively, to stdout:
-println!("{:#?}", deobfuscator.cleaned_code);
+println!("{:?}", deobfuscator.cleaned_code);
 ```
 
 ---
