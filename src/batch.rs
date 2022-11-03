@@ -38,6 +38,8 @@ pub enum CharSet {
     Letters,
     /// A character set containing bad characters that break the terminal when obfuscated on their own.
     BadChars,
+    /// A character set containing chars which **should** be safe to use in obfuscated variable names.
+    GoodChars,
 }
 
 impl CharSet {
@@ -55,7 +57,12 @@ impl CharSet {
                             'v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
                             'R','S','T','U','V','W','X','Y','Z'],
 
-            CharSet::BadChars => vec!['<','>','|','%','^','&', '\n', '\r'],
+            CharSet::BadChars => vec!['<','>','|','%','^','&','\n','\r'],
+
+            CharSet::GoodChars => vec!['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
+                            'v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
+                            'R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','#',
+                            '$','*','(',')','[',']','{','}',',','-','.','?','@','_','~'],
         }
     }
 }
@@ -77,9 +84,16 @@ pub fn generate_random_chars(min: Option<u32>, max: Option<u32>, used: &HashSet<
     let mut rng_chars: Vec<char> = Vec::new();
     let mut rng = thread_rng();
 
-    for _ in 0..=thread_rng().gen_range(min_len..=max_len) {
-        rng_chars.push(*CharSet::Letters.values().choose(&mut rng).expect("CharSet should not be empty!"));
+    // Numbers and *most* symbols can be included in variable names as long as they aren't directly adjacent to the leading or trailing '%'.
+    #[allow(non_snake_case)]
+    for N in 0..=(thread_rng().gen_range(min_len..=max_len)-1) {
+        if N == 0 {
+            rng_chars.push(*CharSet::Letters.values().choose(&mut rng).expect("CharSet::Letters should not be empty!"));
+        }else {
+            rng_chars.push(*CharSet::GoodChars.values().choose(&mut rng).expect("CharSet::GoodChars should not be empty!"));
+        };
     };
+    rng_chars.push(*CharSet::Letters.values().choose(&mut rng).expect("Charset::Letters should not be empty!"));
 
     let rng_string: String = rng_chars.into_iter().collect();
 
