@@ -82,9 +82,15 @@ impl BatchDeobfuscator {
     pub fn initialize(&mut self, src: String) {
 
         // Pattern matching to identify set, space, and equals variables.
-        let re_set = Regex::new("set [a-zA-Z]+=set").expect("Regex not valid!");
-        let re_space = Regex::new("%[a-zA-Z]+% [a-zA-Z]+= ").expect("Regex not valid!");
-        let re_equal = Regex::new("%[a-zA-Z]+%[a-zA-Z]+==").expect("Regex not valid!");
+        let re_set = Regex::new(
+            r"set [a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+=set"
+        ).expect("Regex not valid!");
+        let re_space = Regex::new(
+            r"%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+% [a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+= "
+        ).expect("Regex not valid!");
+        let re_equal = Regex::new(
+            r"%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+=="
+        ).expect("Regex not valid!");
         let set_match: Vec<&str> = re_set.find_iter(&src).map(|mat| mat.as_str()).collect();
         let space_match: Vec<&str> = re_space.find_iter(&src).map(|mat| mat.as_str()).collect();
         let equal_match: Vec<&str> = re_equal.find_iter(&src).map(|mat| mat.as_str()).collect();
@@ -125,7 +131,9 @@ impl BatchDeobfuscator {
     /// Reverse-engineers an obfuscated alphabet using known patterns in the obfuscated source code.
     fn reverse_alphabet(&mut self, src: &str) {
 
-        let re = Regex::new(r"[a-zA-Z]+%[a-zA-Z]+%.{1}\n").expect("Regex pattern invalid!");
+        let re = Regex::new(
+            r"[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%.{1}\n"
+        ).expect("Regex pattern invalid!");
 
         let matches: Vec<&str> = re.find_iter(src).map(|mat| mat.as_str()).collect();
 
@@ -137,7 +145,10 @@ impl BatchDeobfuscator {
             self.alphabet.insert(name, chr);
         };
 
-        let re2 = Regex::new(r"[a-zA-Z]+%[a-zA-Z]+%.{2}\n").expect("Regex pattern invalid!");
+        let re2 = Regex::new(
+            r"[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%.{2}\n"
+        ).expect("Regex pattern invalid!");
+
         let matches: Vec<&str> = re2.find_iter(src).map(|mat| mat.as_str()).collect();
 
         for mtch in matches {
@@ -152,7 +163,10 @@ impl BatchDeobfuscator {
             self.alphabet.insert(name, blob);
         };
 
-        let re3 = Regex::new(r"%[a-zA-Z]+%%[a-zA-Z]+%[a-zA-Z]+%[a-zA-Z]+%.{3,}\n").expect("Regex pattern invalid!");
+        let re3 = Regex::new(
+            r"%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%.{3,}\n"
+        ).expect("Regex pattern invalid!");
+
         let matches: Vec<&str> = re3.find_iter(src).map(|mat| mat.as_str()).collect();
 
         for mtch in matches {
