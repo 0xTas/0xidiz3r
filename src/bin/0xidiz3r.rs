@@ -48,6 +48,10 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     echo_off: bool,
 
+    /// Skip warnings about user-defined variables and continue automatically
+    #[arg(short, long, default_value_t = false)]
+    yeet_it: bool,
+
     /// Custom name for the output file
     #[arg(short, long)]
     output_file: Option<String>,
@@ -94,6 +98,9 @@ fn main() {
         let mut obfuscator: BatchObfuscator = BatchObfuscator::new();
         if args.echo_off {
             obfuscator.dont_echo();
+        };
+        if args.yeet_it {
+            obfuscator.dont_warn();
         };
 
         if let Ok(contents) = fs::read_to_string(args.input.trim_end()) {
