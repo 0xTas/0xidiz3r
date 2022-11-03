@@ -1,6 +1,6 @@
 [package]
 name = "oxidizer"
-version = "0.3.3"
+version = "0.4.0"
 authors = ["Zach Griffin (0xTas) <root@0xTas.dev>"]
 description = "An attempt at reversible Batch obfuscation."
 repository = "https://github.com/0xTas/0xidiz3r"
@@ -13,6 +13,7 @@ edition = "2021"
 clap = { version = "4.0.18", features = ["derive"] }
 rand = "0.8.5"
 regex = "1.6.0"
+
 
 [profile.release]
 lto = true
