@@ -23,17 +23,18 @@ use regex::Regex;
 use std::{
     fs::File,
     io::Write,
+    process::exit,
     collections::{
         HashMap,
         HashSet
-    },
+    }
 };
 use crate::{
     input,
     batch::{
         generate_random_chars,
         CharSet
-    },
+    }
 };
 
 
@@ -61,6 +62,7 @@ pub struct BatchObfuscator {
     pub exec_commands: Vec<String>,
     pub obfuscated_code: String,
     echo_mode: bool,
+    warn_mode: bool,
     initialized: bool,
 }
 
@@ -78,6 +80,7 @@ impl BatchObfuscator {
             exec_commands: Vec::new(),
             obfuscated_code: String::new(),
             echo_mode: false,
+            warn_mode: true,
             initialized: false,
         }
     }
@@ -85,6 +88,11 @@ impl BatchObfuscator {
     /// Prevents from writing boiler-plate "@echo off" to output script.
     pub fn dont_echo(&mut self) {
         self.echo_mode = true;
+    }
+
+    /// Disables warnings about user-defined variables in input scripts.
+    pub fn dont_warn(&mut self) {
+        self.warn_mode = false;
     }
 
     /// Initializes an empty BatchObfuscator, builds an obfuscated alphabet, and uses it to obfuscate the provided source code.<br><br>
@@ -229,7 +237,7 @@ impl BatchObfuscator {
                 (match_set_lines.is_match(&line) && line.to_lowercase().starts_with("set")) {
 
                 let mut heed: String = String::new();
-                if !warned {
+                if !warned && self.warn_mode {
                     println!("\n[!]--> WARNING: Because of the way this obfuscation method works, 
                         variables you define or use in your scripts, including environment variables,
                         and function labels, cannot be effectively obfuscated using this obfuscation method, 
@@ -238,11 +246,12 @@ impl BatchObfuscator {
                     heed = input("\nContinue Anyway? [Y/N] ~> ");
                 };
 
-                if heed.to_lowercase().contains("y") || warned {
+                if !self.warn_mode || heed.to_lowercase().contains("y") || warned {
                     self.exec_commands.push(format!("{}", line));
                     warned = true;
                 }else {
-                    panic!("Obfuscation Aborted!");
+                    println!("\nObfuscation aborted!");
+                    exit(0);
                 };
             }else {
 
