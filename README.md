@@ -35,7 +35,7 @@ Using Regex patterns and assumptions made about the structure of the obfuscation
 
 **This program makes no guarantees about the fidelity or accuracy of the deobfuscated scripts it produces.**<br><br>
 
-As long as the input script was obfuscated using the above technique, where the obfuscated variable names contain only letters, 
+As long as the input script was obfuscated using the above technique, where the obfuscated variable names contain only characters in the CharSet::GoodChars set, 
 and as long as the obfuscated alphabet is mostly intact (each obfuscated variable used needs a matching definition statement), the deobfuscation **should** work.<br>
 
 That being said, I don't do much with Batch, and didn't have a wide variety of scripts to test with.<br>
