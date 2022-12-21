@@ -23,6 +23,7 @@ use super::CharSet;
 use std::{
     fs::File,
     io::Write,
+    process::exit,
     collections::HashMap
 };
 
@@ -100,7 +101,7 @@ impl BatchDeobfuscator {
             equal_match.is_empty()
         {
             eprintln!("\nInput script does not appear to be compatible with deobfuscation!");
-            std::process::exit(1);
+            exit(1);
         };
         
         // Extract the proper variable strings based on the structure of the obfuscation.
@@ -121,7 +122,9 @@ impl BatchDeobfuscator {
     }
 
     /// Writes the deobfuscated source of a pre-initialized BatchDeobfuscator to a file, and returns a string containing the name of that file.<br><br>
-    /// Output filename defaults to *deobfuscated.bat* when **None** is passed into the parameter.<br><br>
+    /// Output filename defaults to *deobfuscated.bat* when **None** is passed into the parameter.<br>
+    /// 
+    /// # Panics
     /// **This method panics if file creation/writing fails.**
     pub fn write_deobfuscated_script(&self, file_name: Option<String>) -> String {
 

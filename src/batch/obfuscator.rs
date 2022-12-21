@@ -134,7 +134,7 @@ impl BatchObfuscator {
 
         if !self.initialized {
             eprintln!("\nObfuscator must first be initialized!");
-            std::process::exit(1);
+            exit(1);
         };
 
         let handle_name: String = file_name.unwrap_or_else(|| String::from("obfuscated.bat"));
@@ -174,7 +174,7 @@ impl BatchObfuscator {
         };
     }
 
-    // Obfuscates cleartext batch commands using an obfuscated alphabet of variables.
+    /// Obfuscates cleartext batch commands using an obfuscated alphabet of variables.
     fn obfuscate(&mut self, src: String) {
 
         let match_variable_lines: Regex = Regex::new("%[a-zA-Z0-9_-~!@#$^&/.,<>;:'\"=]+%").expect("Regex not valid!");

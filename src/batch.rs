@@ -70,7 +70,7 @@ impl CharSet {
 
 /* Batch Utility Functions */
 
-/// Returns a string of a random length between min/max containing random ascii letters (mixed case).<br><br>
+/// Returns a string of a random length between min/max containing random letters (mixed case), digits and some symbols.<br><br>
 /// Call with *min* or *max* set to *None* to use default values.<br>
 /// Min default value is (7), Max default value is (109).<br><br>
 /// Batch has a single-line limit of **8191**, so keep this in mind when changing these values.<br><br>

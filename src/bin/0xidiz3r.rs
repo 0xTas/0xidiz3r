@@ -67,7 +67,6 @@ struct Args {
 
 
 fn main() {
-    
     let mut args = Args::parse();
 
     if let Some(min_value) = args.min {
