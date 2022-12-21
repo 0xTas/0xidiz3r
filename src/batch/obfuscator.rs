@@ -32,8 +32,8 @@ use std::{
 use crate::{
     input,
     batch::{
-        generate_random_chars,
-        CharSet
+        CharSet,
+        generate_random_chars
     }
 };
 
@@ -51,7 +51,7 @@ use crate::{
 /// 
 /// // prints: "Obfuscated code was written to: obfuscated.bat".
 /// println!("Obfuscated code was written to: {}", obfuscated_script);
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BatchObfuscator {
     pub set_str: String,
     pub space_str: String,
@@ -119,7 +119,7 @@ impl BatchObfuscator {
         self.prep_commands.push(format!("%{}%%{}%{}==", self.set_str, self.space_str, self.eq_str));
 
         // Build an obfuscated alphabet with variables and push their assignment statements into the prep_commands Vec.
-        self.build_alphabet(min.clone(), max.clone());
+        self.build_alphabet(min, max);
 
         // Obfuscate the cleartext source code using our newly-created obfuscated alphabet.
         self.obfuscate(src);
@@ -132,9 +132,12 @@ impl BatchObfuscator {
     /// **This method panics if file creation/writing fails.**
     pub fn write_obfuscated_script(&self, file_name: Option<String>) -> String {
 
-        if !self.initialized { panic!("Obfuscator must first be initialized!"); };
+        if !self.initialized {
+            eprintln!("\nObfuscator must first be initialized!");
+            std::process::exit(1);
+        };
 
-        let handle_name: String = file_name.unwrap_or(String::from("obfuscated.bat"));
+        let handle_name: String = file_name.unwrap_or_else(|| String::from("obfuscated.bat"));
         let handle_clone: String = handle_name.clone();
 
         let mut file = File::create(handle_clone.as_str()).expect("Failed to create file!");
@@ -156,14 +159,14 @@ impl BatchObfuscator {
                 self.alphabet.insert(chr, varname.clone());
 
                 if !self.prep_commands.contains(&BatchObfuscator::define_batch_variable(
-                                            format!("{}", varname.to_owned()),
+                                            varname.to_owned().to_string(),
                                             format!("{}", chr.to_owned()),
-                                            &self)) 
+                                            self)) 
                 {
                     self.prep_commands.push(BatchObfuscator::define_batch_variable(
-                                            format!("{}", varname.to_owned()),
+                                            varname.to_owned().to_string(),
                                             format!("{}", chr.to_owned()),
-                                            &self));
+                                            self));
                 };
             }else {
                 self.alphabet.insert(chr, format!("{}", chr));
@@ -176,7 +179,7 @@ impl BatchObfuscator {
 
         let match_variable_lines: Regex = Regex::new("%[a-zA-Z0-9_-~!@#$^&/.,<>;:'\"=]+%").expect("Regex not valid!");
         let match_set_lines: Regex = Regex::new("set .+=.+").expect("Regex not valid!");
-        let src_list: Vec<&str> = src.split("\n").collect();
+        let src_list: Vec<&str> = src.split('\n').collect();
         let mut warned: bool = false;
 
         for line in src_list {
@@ -190,12 +193,12 @@ impl BatchObfuscator {
                     };
                 };
 
-                if perc_index.len() <= 0 { return None };
+                if perc_index.is_empty() { return None };
 
                 Some(perc_index)
             };
 
-            if line.contains("%") && !match_variable_lines.is_match(&line) {
+            if line.contains('%') && !match_variable_lines.is_match(line) {
 
                 let perc_index: Vec<usize> = find_percent_index().expect("No percent symbols in sample!");
 
@@ -208,10 +211,10 @@ impl BatchObfuscator {
                     };
 
                     if perc_index.contains(&i) {
-                        let blob: &str = &line.clone()[i..=i+1];
+                        let blob: &str = &line[i..=i+1];
                         let mut obfuscate_blob = || {
                             let varname: String = generate_random_chars(None, None, &self.used_variable_strings);
-                            let varline: String = BatchObfuscator::define_batch_variable(varname.clone(), blob.to_string(), &self);
+                            let varline: String = BatchObfuscator::define_batch_variable(varname.clone(), blob.to_string(), self);
 
                             self.prep_commands.push(varline);
                             self.exec_commands.push(format!("%{}%", varname));
@@ -232,9 +235,9 @@ impl BatchObfuscator {
                 };
 
             // If the input script contains custom/environment vars, warn about this method's limitations.
-            }else if match_variable_lines.is_match(&line) ||
-                (line.starts_with(":") && !line.starts_with("::")) || 
-                (match_set_lines.is_match(&line) && line.to_lowercase().starts_with("set")) {
+            }else if match_variable_lines.is_match(line) ||
+                (line.starts_with(':') && !line.starts_with("::")) || 
+                (match_set_lines.is_match(line) && line.to_lowercase().starts_with("set")) {
 
                 let mut heed: String = String::new();
                 if !warned && self.warn_mode {
@@ -246,8 +249,8 @@ impl BatchObfuscator {
                     heed = input("\nContinue Anyway? [Y/N] ~> ");
                 };
 
-                if !self.warn_mode || heed.to_lowercase().contains("y") || warned {
-                    self.exec_commands.push(format!("{}", line));
+                if !self.warn_mode || heed.to_lowercase().contains('y') || warned {
+                    self.exec_commands.push(line.to_owned());
                     warned = true;
                 }else {
                     println!("\nObfuscation aborted!");

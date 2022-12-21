@@ -86,7 +86,7 @@ pub fn generate_random_chars(min: Option<u32>, max: Option<u32>, used: &HashSet<
 
     // Numbers and *most* symbols can be included in variable names as long as they aren't directly adjacent to the leading or trailing '%'.
     #[allow(non_snake_case)]
-    for N in 0..=(thread_rng().gen_range(min_len..=max_len)-1) {
+    for N in 0..(thread_rng().gen_range(min_len..=max_len)-1) {
         if N == 0 {
             rng_chars.push(*CharSet::Letters.values().choose(&mut rng).expect("CharSet::Letters should not be empty!"));
         }else {
@@ -98,8 +98,8 @@ pub fn generate_random_chars(min: Option<u32>, max: Option<u32>, used: &HashSet<
     let rng_string: String = rng_chars.into_iter().collect();
 
     if !used.contains(&rng_string) {
-        return rng_string;
+        rng_string
     }else {
-        return generate_random_chars(Some(min_len), Some(max_len), used);
-    };
+        generate_random_chars(Some(min_len), Some(max_len), used)
+    }
 }

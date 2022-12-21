@@ -53,7 +53,7 @@ use std::{
 /// 
 /// // prints: "Deobfuscated code was written to: deobfuscated.bat".
 /// println!("Deobfuscated code was written to: {}", deobfuscated_script);
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BatchDeobfuscator {
     pub set_str: String,
     pub space_str: String,
@@ -84,21 +84,29 @@ impl BatchDeobfuscator {
         // Pattern matching to identify set, space, and equals variables.
         let re_set = Regex::new(
             r"set [a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+=set"
-        ).expect("Regex not valid!");
+        ).expect("Regex pattern invalid!");
         let re_space = Regex::new(
             r"%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+% [a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+= "
-        ).expect("Regex not valid!");
+        ).expect("Regex pattern invalid!");
         let re_equal = Regex::new(
             r"%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+%[a-zA-Z0-9!#\$\*\(\)\[\]\{\},-\.\?@_~]+=="
-        ).expect("Regex not valid!");
+        ).expect("Regex pattern invalid!");
         let set_match: Vec<&str> = re_set.find_iter(&src).map(|mat| mat.as_str()).collect();
         let space_match: Vec<&str> = re_space.find_iter(&src).map(|mat| mat.as_str()).collect();
         let equal_match: Vec<&str> = re_equal.find_iter(&src).map(|mat| mat.as_str()).collect();
+
+        if set_match.is_empty() ||
+            space_match.is_empty() ||
+            equal_match.is_empty()
+        {
+            eprintln!("\nInput script does not appear to be compatible with deobfuscation!");
+            std::process::exit(1);
+        };
         
         // Extract the proper variable strings based on the structure of the obfuscation.
-        let set_str: &str = set_match[0].split(" ").collect::<Vec<&str>>()[1];
-        let space_str: &str = space_match[0].split(" ").collect::<Vec<&str>>()[1];
-        let eq_str: &str = equal_match[0].split("%").collect::<Vec<&str>>()[2];
+        let set_str: &str = set_match[0].split(' ').collect::<Vec<&str>>()[1];
+        let space_str: &str = space_match[0].split(' ').collect::<Vec<&str>>()[1];
+        let eq_str: &str = equal_match[0].split('%').collect::<Vec<&str>>()[2];
         self.set_str = set_str[0..set_str.len()-4].to_string();
         self.space_str = space_str[0..space_str.len()-2].to_string();
         self.eq_str = eq_str[0..eq_str.len()-2].to_string();
@@ -117,9 +125,12 @@ impl BatchDeobfuscator {
     /// **This method panics if file creation/writing fails.**
     pub fn write_deobfuscated_script(&self, file_name: Option<String>) -> String {
 
-        if !self.initialized { panic!("Deobfuscator must first be initialized!"); };
+        if !self.initialized { 
+            eprintln!("\nDeobfuscator must first be initialized!");
+            std::process::exit(1);
+        };
 
-        let handle_name: String = file_name.unwrap_or(String::from("deobfuscated.bat"));
+        let handle_name: String = file_name.unwrap_or_else(|| String::from("deobfuscated.bat"));
         let handle_clone: String = handle_name.clone();
 
         let mut file = File::create(handle_clone.as_str()).expect("Failed to create file!");
@@ -140,7 +151,7 @@ impl BatchDeobfuscator {
         for mtch in matches {
             let chr: String = format!("{}", mtch.chars().nth(mtch.len()-2).unwrap());
 
-            let name: String = String::from(mtch.split("%").collect::<Vec<&str>>()[0]);
+            let name: String = String::from(mtch.split('%').collect::<Vec<&str>>()[0]);
 
             self.alphabet.insert(name, chr);
         };
@@ -158,7 +169,7 @@ impl BatchDeobfuscator {
                 mtch.chars().nth(mtch.len()-2).unwrap()
             );
 
-            let name: String = String::from(mtch.split("%").collect::<Vec<&str>>()[0]);
+            let name: String = String::from(mtch.split('%').collect::<Vec<&str>>()[0]);
 
             self.alphabet.insert(name, blob);
         };
@@ -172,10 +183,10 @@ impl BatchDeobfuscator {
         for mtch in matches {
             match mtch.find(&self.eq_str) {
                 Some(index) => {
-                    let name_haystack: Vec<&str> = mtch.split("%").collect();
+                    let name_haystack: Vec<&str> = mtch.split('%').collect();
                     let name: String = String::from(name_haystack[name_haystack.len()-3]);
                     let blob: &str = &mtch[(index+self.eq_str.len()+1)..];
-                    println!("name {:#?}", mtch.split("%").collect::<Vec<&str>>());
+                    println!("name {:#?}", mtch.split('%').collect::<Vec<&str>>());
                     self.alphabet.insert(name, blob.to_string());
                 },
                 None => {
@@ -188,13 +199,13 @@ impl BatchDeobfuscator {
     /// Deobfuscates a sample of obfuscated batch commands using a reverse-engineered obfuscation alphabet.
     fn deobfuscate(&mut self, src: String) {
 
-        let src: Vec<&str> = src.split("\n").collect();
+        let src: Vec<&str> = src.split('\n').collect();
 
         // Iterate over the remaining obfuscated text and map the obfuscated strings to cleartext characters.
         let mut cleaned_chars: Vec<String> = Vec::new();
         for line in src {
 
-            if line == "\n" || line == "\r\n" || line == "" { continue; };
+            if line == "\n" || line == "\r\n" || line.is_empty() { continue; };
 
             if line.contains(&self.set_str) || line.contains(&self.space_str) || line.contains(&self.eq_str) {
                 continue;
@@ -205,7 +216,7 @@ impl BatchDeobfuscator {
                 continue;
             };
 
-            let code: Vec<&str> = line.split("%").collect();
+            let code: Vec<&str> = line.split('%').collect();
 
             for blob in code {
                 if let Some(chr) = self.alphabet.get(&blob.to_string()) {
@@ -215,7 +226,7 @@ impl BatchDeobfuscator {
                         if blob.contains(c.as_str()) { continue };
                     };
 
-                    if !blob.contains(" ") && blob != "" && blob != "\r" {
+                    if !blob.contains(' ') && !blob.is_empty() && blob != "\r" {
                         let mut skip: bool = false;
                         for character in blob.chars() {
                             if CharSet::BadChars.values().contains(&character) {
@@ -239,7 +250,7 @@ impl BatchDeobfuscator {
         };
 
         // Clean up the last remaining artifacts of the obfuscation.
-        cleaned_chars = cleaned_chars.join("").split("\n").map(|chr| chr.to_string()).collect();
+        cleaned_chars = cleaned_chars.join("").split('\n').map(|chr| chr.to_string()).collect();
 
         // Reassemble the cleartext code and finalize the initialization.
         self.cleaned_code = cleaned_chars.join("\n").trim_end().to_string();

@@ -72,7 +72,7 @@ fn main() {
 
     if let Some(min_value) = args.min {
         if let Some(max_value) = args.max {
-            if min_value >= max_value {
+            if min_value > max_value {
                 args.max = Some(args.min.unwrap() * 2);
             };
         };
